@@ -51,6 +51,10 @@ module.exports = {
         from: path.resolve(__dirname, './src/popup.html'),
         to: path.resolve(__dirname, './build/popup.html'),
       },
+      {
+        from: path.resolve(__dirname, './src/assets'),
+        to: path.resolve(__dirname, './build/assets'),
+      },
     ]),
   ],
 };

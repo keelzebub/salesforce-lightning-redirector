@@ -3,7 +3,11 @@
   "description": "Redirect Salesforce Lightning case links to Salesforce Classic",
   "author": "Kellen Hawley",
   "version": "1.0.0",
-  "icons": {},
+  "icons": {
+    "16": "assets/salesforce-lightning-redirect-16.png",
+    "48": "assets/salesforce-lightning-redirect-48.png",
+    "128": "assets/salesforce-lightning-redirect-128.png"
+  },
   "background": {
     "scripts": [
       "background.js"
