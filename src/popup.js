@@ -1,5 +1,7 @@
-import React, { Fragment, useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
+
+import './popup.scss';
 
 // this hook will store the state in localStorage and also send it to background.js
 const useStateWithLocalStorageAndMessaging = (localStorageKey, defaultValue) => {
@@ -21,7 +23,7 @@ const useStateWithLocalStorageAndMessaging = (localStorageKey, defaultValue) => 
 
   chrome.runtime.sendMessage({[localStorageKey]: value});
 
-  React.useEffect(() => {
+  useEffect(() => {
     localStorage[localStorageKey] = value;
 
     chrome.runtime.sendMessage({ name: localStorageKey, value });
@@ -57,15 +59,13 @@ const Popup = () => {
       newSelectedTypes.splice(index, 1);
     }
 
-    console.log(newSelectedTypes)
-
     setSelectedTypes(newSelectedTypes);
   };
 
   const buildListTypeRadios = () => {
     return (
       <section>
-        <article>
+        <article className='popup-listType'>
           <input
             type='radio'
             value='true'
@@ -74,9 +74,9 @@ const Popup = () => {
             checked={isWhitelist}
             onChange={listTypeHandler}
           />
-          <label htmlFor='whitelist-true'>Only redirect selected types</label>
+          <label htmlFor='whitelist-true'>Only redirect selected types.</label>
         </article>
-        <article>
+        <article className='popup-listType'>
           <input
             type='radio'
             value='false'
@@ -86,7 +86,7 @@ const Popup = () => {
             checked={!isWhitelist}
             onChange={listTypeHandler}
           />
-          <label htmlFor='whitelist-false'>Redirect everything *except* selected types</label>
+          <label htmlFor='whitelist-false'>Redirect everything <i>except</i> selected types.</label>
         </article>
       </section>
     );
@@ -101,7 +101,7 @@ const Popup = () => {
     ];
 
     return types.map(([id, name]) => (
-      <article key={id}>
+      <article key={id} className='popup-pageTypes-type'>
         <input
           type='checkbox'
           id={id}
@@ -115,19 +115,45 @@ const Popup = () => {
     ));
   };
 
+  const buildOptions = () => {
+    if (isEnabled) {
+      return (
+        <section className='popup-content'>
+          <section>
+            <h4>Options</h4>
+            {buildListTypeRadios()}
+          </section>
+
+          <section>
+            <h4>Page Types</h4>
+            <section className='popup-pageTypes'>
+              {buildTypeCheckboxes()}
+            </section>
+          </section>
+        </section>
+      );
+    }
+
+    return (
+      <p className='popup-disabled'>
+        Disabled.
+      </p>
+    );
+  };
+
   return (
-    <Fragment>
+    <main className='popup'>
       <header>
-        Salesforce Lightning Redirect
+        <section className='popup-title'>
+          <h3>Salesforce Lightning Redirector</h3>
+          <button onClick={enableHandler}>
+            {isEnabled ? 'Disable' : 'Enable'}
+          </button>
+        </section>
+        <p className='popup-description'>Redirect Salesforce Lightning links to Salesforce Classic.</p>
       </header>
-      <main>
-        <button onClick={enableHandler}>
-          {isEnabled ? 'Disable' : 'Enable'}
-        </button>
-        {buildListTypeRadios()}
-        {buildTypeCheckboxes()}
-      </main>
-    </Fragment>
+      {buildOptions()}
+    </main>
   );
 };
 
