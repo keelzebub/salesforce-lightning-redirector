@@ -1,0 +1,56 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+h3 {
+  margin: 0;
+}
+
+h4 {
+  margin: 12px 0 4px;
+}
+
+.popup {
+  width: 300px;
+  padding: 12px;
+  color: #333;
+}
+
+.popup-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;;
+}
+
+.popup-description {
+  margin: 8px 0;
+  color: #666;
+}
+
+.popup-content {
+  margin-top: 12px;
+}
+
+.popup-listType {
+  margin: 4px 0;
+}
+
+.popup-pageTypes {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.popup-pageTypes-type {
+  margin: 4px 0;
+  width: 50%;
+}
+
+.popup-disabled {
+  font-style: italic;
+  text-align: center;
+  color: #666;
+}
