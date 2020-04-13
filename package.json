@@ -4,7 +4,7 @@
   "description": "Redirect Salesforce Lightning case links to Salesforce Classic.",
   "main": "src/background.js",
   "scripts": {
-    "build": "npm install; npx webpack",
+    "build": "npm install; npx webpack --mode=production",
     "start": "npx webpack --watch"
   },
   "repository": {
