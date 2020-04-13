@@ -1,6 +1,6 @@
 {
   "name": "Salesforce Lightning to Classic",
-  "description": "Redirect Salesforce Lightning case links to Salesforce Classic",
+  "description": "Redirect Salesforce Lightning to Salesforce Classic",
   "author": "Kellen Hawley",
   "version": "1.0.0",
   "icons": {

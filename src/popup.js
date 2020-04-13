@@ -33,7 +33,7 @@ const useStateWithLocalStorageAndMessaging = (localStorageKey, defaultValue) => 
 // this is the actual popup
 const Popup = () => {
   const [selectedTypes, setSelectedTypes] = useStateWithLocalStorageAndMessaging('selectedTypes', []);
-  const [isWhitelist, setIsWhitelist] = useStateWithLocalStorageAndMessaging('isWhitelist', true);
+  const [isWhitelist, setIsWhitelist] = useStateWithLocalStorageAndMessaging('isWhitelist', false);
   const [isEnabled, setIsEnabled] = useStateWithLocalStorageAndMessaging('isEnabled', true);
   const [classicDisabled, setClassicDisabled] = useState(false);
 
