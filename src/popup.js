@@ -133,7 +133,7 @@ const Popup = () => {
           <h3>Salesforce Lightning Redirector</h3>
         </section>
         <section className='popup-description'>
-          <span>Salesforce Lightning → Salesforce Classic.</span>
+          <span>Salesforce Lightning {String.fromCharCode(8594)} Salesforce Classic.</span>
           <button onClick={enableHandler}>
             {isEnabled ? 'Disable' : 'Enable'}
           </button>
