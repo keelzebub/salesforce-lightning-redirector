@@ -1,5 +1,9 @@
 import difference from 'lodash/difference';
 
+let lastRedirectedUrl = '';
+let redirectTimeout;
+let isSalesforceClassicDisabled = false;
+
 const options = {
   isEnabled: true,
   isWhitelist: true,
@@ -7,14 +11,20 @@ const options = {
 };
 
 chrome.runtime.onMessage.addListener(
-  function(request, _sender, _sendResponse) {
-    options[request.name] = request.value;
+  function(request, _sender, sendResponse) {
+    if (request.name === 'refreshExt') {
+      isSalesforceClassicDisabled = false;
+      chrome.browserAction.setBadgeText({text: ''});
+    } else if (request.name === 'updateOption') {
+      options[request.key] = request.value;
+    } else if (request.name === 'checkIfSalesforceClassicDisabled') {
+      sendResponse({ isSalesforceClassicDisabled });
+    }
   }
 );
 
-
 chrome.webRequest.onBeforeRequest.addListener(function(details) {
-  if (!options.isEnabled) {
+  if (!options.isEnabled || isSalesforceClassicDisabled) {
     return {};
   }
 
@@ -26,6 +36,15 @@ chrome.webRequest.onBeforeRequest.addListener(function(details) {
     'Account',
   ];
 
+  // if we redirected this URL within the last 1 second (see timeout below),
+  // the user probably has Classic view disabled
+  if (lightningUrl === lastRedirectedUrl || lightningUrl.match(/\/_classic\//)) {
+    chrome.browserAction.setBadgeBackgroundColor({ color: [255, 0, 0, 255] });
+    chrome.browserAction.setBadgeText({text: '!'});
+    isSalesforceClassicDisabled = true;
+    return {};
+  }
+
   if (options.isWhitelist) {
     sectionsToRedirect = options.selectedTypes;
   } else {
@@ -34,13 +53,22 @@ chrome.webRequest.onBeforeRequest.addListener(function(details) {
 
   const sectionString = sectionsToRedirect.join('|');
 
-  const regex = new RegExp(`(?<company>[\\w\\d]*).lightning.force.com\\/.*\\/(${sectionString})\\/(?<id>[\\w\\d]*)\\/view$`);
+  const regexPattern = `(?<company>[\\w\\d]*).lightning.force.com\\/.*\\/(${sectionString})\\/(?<id>[\\w\\d]*)\\/view$`;
+  const regex = new RegExp(regexPattern);
   let classicUrl;
 
   const urlMatch = lightningUrl.match(regex);
 
   if (urlMatch && urlMatch.groups) {
     classicUrl = `https://${urlMatch.groups.company}.my.salesforce.com/${urlMatch.groups.id}`;
+
+    // set the last redirected URL and clear it out after 1 second
+    lastRedirectedUrl = lightningUrl;
+    clearTimeout(redirectTimeout);
+    redirectTimeout = setTimeout(function() {
+      lastRedirectedUrl = '';
+    }, 1000);
+
 
     return {
       redirectUrl: classicUrl,
@@ -49,4 +77,8 @@ chrome.webRequest.onBeforeRequest.addListener(function(details) {
 
   return {};
 
-}, {urls: ['*://lightspeed.lightning.force.com/*'], types: ['main_frame']}, ['blocking']);
+}, {urls: ['*://*.lightning.force.com/*'], types: ['main_frame']}, ['blocking']);
+
+chrome.webRequest.onHeadersReceived.addListener(function(details) {
+  return {};
+}, {urls: ['<all_urls>'], types: ['main_frame']}, ['blocking']);

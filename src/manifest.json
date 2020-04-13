@@ -20,7 +20,8 @@
   "permissions": [
     "webRequestBlocking",
     "webRequest",
-    "*://lightspeed.lightning.force.com/"
+    "*://*.lightning.force.com/",
+    "*://*.my.salesforce.com/"
   ],
   "manifest_version": 2
 }

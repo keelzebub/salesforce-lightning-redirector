@@ -8,6 +8,11 @@ body {
 
 h3 {
   margin: 0;
+  font-size: 18px;
+}
+
+input {
+  margin-right: 8px;
 }
 
 h4 {
@@ -16,8 +21,16 @@ h4 {
 
 .popup {
   width: 300px;
-  padding: 12px;
+  margin: 12px;
   color: #333;
+}
+
+.popup--error {
+  padding: 12px;
+  border: 1px solid #EB4962;
+  background: #EB49620D;
+  color: #EB4962;
+  border-radius: 4px;
 }
 
 .popup-title {
@@ -29,14 +42,24 @@ h4 {
 .popup-description {
   margin: 8px 0;
   color: #666;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .popup-content {
   margin-top: 12px;
+  font-size: 14px;
+}
+
+.popup-content-section {
+  margin-top: 16px;
 }
 
 .popup-listType {
   margin: 4px 0;
+  display: flex;
+  align-items: center;
 }
 
 .popup-pageTypes {
@@ -47,10 +70,26 @@ h4 {
 .popup-pageTypes-type {
   margin: 4px 0;
   width: 50%;
+  display: flex;
 }
 
 .popup-disabled {
+  font-size: 14px;
+  color: #666;
   font-style: italic;
   text-align: center;
-  color: #666;
+  margin: 24px 0 32px;
+}
+
+.popup-error {
+  font-size: 14px;
+  line-height: 1.5em;
+}
+
+.popup-error-note {
+  font-style: italic;
+}
+
+.popup-error-buttonContainer {
+  text-align: center;
 }

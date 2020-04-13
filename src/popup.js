@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Fragment } from 'react';
 import ReactDOM from 'react-dom';
 
 import './popup.scss';
@@ -11,7 +11,7 @@ const useStateWithLocalStorageAndMessaging = (localStorageKey, defaultValue) => 
     storedValue = true;
   } else if (storedValue === 'false') {
     storedValue = false;
-  } else if (storedValue.length > 0) {
+  } else if (storedValue && storedValue.length > 0) {
     storedValue = storedValue.split(',');
   } else {
     storedValue = undefined;
@@ -21,21 +21,34 @@ const useStateWithLocalStorageAndMessaging = (localStorageKey, defaultValue) => 
     storedValue !== undefined ? storedValue : defaultValue
   );
 
-  chrome.runtime.sendMessage({[localStorageKey]: value});
-
   useEffect(() => {
     localStorage[localStorageKey] = value;
 
-    chrome.runtime.sendMessage({ name: localStorageKey, value });
+    chrome.runtime.sendMessage({ name: 'updateOption', key: localStorageKey, value });
   }, [value]);
 
   return [value, setValue];
 };
 
+// this is the actual popup
 const Popup = () => {
   const [selectedTypes, setSelectedTypes] = useStateWithLocalStorageAndMessaging('selectedTypes', []);
   const [isWhitelist, setIsWhitelist] = useStateWithLocalStorageAndMessaging('isWhitelist', true);
   const [isEnabled, setIsEnabled] = useStateWithLocalStorageAndMessaging('isEnabled', true);
+  const [classicDisabled, setClassicDisabled] = useState(false);
+
+  useEffect(function() {
+    chrome.runtime.sendMessage({ name: 'checkIfSalesforceClassicDisabled' }, function(response) {
+      if (response.isSalesforceClassicDisabled) {
+        setClassicDisabled(response.isSalesforceClassicDisabled);
+      }
+    });
+  }, []);
+
+  const refreshExtension = (e) => {
+    chrome.runtime.sendMessage({name: 'refreshExt'});
+    setClassicDisabled(false);
+  };
 
   const enableHandler = (e) => {
     setIsEnabled(!isEnabled);
@@ -82,7 +95,6 @@ const Popup = () => {
             value='false'
             name='whitelist'
             id='whitelist-false'
-            disabled={!isEnabled}
             checked={!isWhitelist}
             onChange={listTypeHandler}
           />
@@ -106,7 +118,6 @@ const Popup = () => {
           type='checkbox'
           id={id}
           value={id}
-          disabled={!isEnabled}
           checked={selectedTypes.includes(id)}
           onChange={typeSelectHandler}
         />
@@ -115,46 +126,86 @@ const Popup = () => {
     ));
   };
 
-  const buildOptions = () => {
-    if (isEnabled) {
+  const buildHeader = () => {
+    return (
+      <header>
+        <section className='popup-title'>
+          <h3>Salesforce Lightning Redirector</h3>
+        </section>
+        <section className='popup-description'>
+          <span>Salesforce Lightning → Salesforce Classic.</span>
+          <button onClick={enableHandler}>
+            {isEnabled ? 'Disable' : 'Enable'}
+          </button>
+        </section>
+      </header>
+    );
+  };
+
+  const buildContent = () => {
+    if (!isEnabled) {
       return (
+        <main className='popup'>
+          {buildHeader()}
+          <p className='popup-disabled'>
+            Disabled.
+          </p>
+        </main>
+      );
+    }
+
+    return (
+      <main className='popup'>
+        {buildHeader()}
         <section className='popup-content'>
-          <section>
+          <section className='popup-content-section'>
             <h4>Options</h4>
             {buildListTypeRadios()}
           </section>
 
-          <section>
+          <section className='popup-content-section'>
             <h4>Page Types</h4>
             <section className='popup-pageTypes'>
               {buildTypeCheckboxes()}
             </section>
           </section>
         </section>
-      );
-    }
-
-    return (
-      <p className='popup-disabled'>
-        Disabled.
-      </p>
+      </main>
     );
   };
 
-  return (
-    <main className='popup'>
-      <header>
-        <section className='popup-title'>
-          <h3>Salesforce Lightning Redirector</h3>
-          <button onClick={enableHandler}>
-            {isEnabled ? 'Disable' : 'Enable'}
-          </button>
+  const buildError = () => {
+    return (
+      <main className='popup popup--error'>
+        <header>
+          <section className='popup-title'>
+            <h3>Error: Salesforce Lightning Redirector</h3>
+          </section>
+        </header>
+        <section className='popup-error'>
+          <p>
+            Salesforce Classic appears to be disabled for your account. To fix:
+          </p>
+          <ol>
+            <li>Click on your profile icon in the top right corner</li>
+            <li>Select <strong>"Switch to Salesforce Classic"</strong></li>
+            <li>Come back here and click <strong>"Refresh"</strong></li>
+          </ol>
+          <p className='popup-error-note'>
+            Note: if you don't see the "Switch to Salesforce Classic" option, you'll need to talk to your
+            Salesforce administrator.
+          </p>
+          <div className='popup-error-buttonContainer'>
+            <button onClick={refreshExtension}>
+              Refresh
+            </button>
+          </div>
         </section>
-        <p className='popup-description'>Redirect Salesforce Lightning links to Salesforce Classic.</p>
-      </header>
-      {buildOptions()}
-    </main>
-  );
+      </main>
+    );
+  };
+
+  return classicDisabled ? buildError() : buildContent();
 };
 
 window.onload = function() {
