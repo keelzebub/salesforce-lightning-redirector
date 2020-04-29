@@ -1,6 +1,9 @@
 # Salesforce Lightning Redirector
 A configurable Chrome extension for redirecting Salesforce Lightning links to Salesforce Classic.
 
+### Where to Install
+https://chrome.google.com/webstore/detail/salesforce-lightning-to-c/gekdgheakgjdkikhmomomgnjokjhijjb
+
 ![Options Menu](https://github.com/beaksandclaws/salesforce-lightning-redirector/blob/master/options-screenshot.png)
 
 ### Getting Started
