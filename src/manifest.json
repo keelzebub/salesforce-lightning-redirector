@@ -2,7 +2,7 @@
   "name": "Salesforce Lightning to Classic",
   "description": "Redirect Salesforce Lightning to Salesforce Classic",
   "author": "Kellen Hawley",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "icons": {
     "16": "assets/salesforce-lightning-redirect-16.png",
     "48": "assets/salesforce-lightning-redirect-48.png",

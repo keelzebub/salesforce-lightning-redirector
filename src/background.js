@@ -6,7 +6,7 @@ let isSalesforceClassicDisabled = false;
 
 const options = {
   isEnabled: true,
-  isWhitelist: true,
+  isWhitelist: false,
   selectedTypes: [],
 };
 
@@ -53,7 +53,7 @@ chrome.webRequest.onBeforeRequest.addListener(function(details) {
 
   const sectionString = sectionsToRedirect.join('|');
 
-  const regexPattern = `(?<company>[\\w\\d]*).lightning.force.com\\/.*\\/(${sectionString})\\/(?<id>[\\w\\d]*)\\/view$`;
+  const regexPattern = `(?<company>[\\w\\d]*).lightning.force.com\\/.*\\/(${sectionString})\\/(?<id>[\\w\\d]*)\\/view`;
   const regex = new RegExp(regexPattern);
   let classicUrl;
 
